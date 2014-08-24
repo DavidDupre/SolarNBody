@@ -17,6 +17,7 @@ Learning goals:
 
 
 This project requires LWJGL and a csv file to load bodies from.
+The default csv file can be found on the wiki, but theoretically a custom csv can be used.
 The CSV file should be in this format:
 
 ID, Name, Parent, Mass(kg), Radius (m), Satellite Count, Satellite's Mass, System Mass, Semi-Major Axis, Eccentricity, Longitude of Ascending Node, Arg of Peri, True Anomaly, <space>, Type
