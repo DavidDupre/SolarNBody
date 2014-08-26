@@ -4,17 +4,20 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.lwjgl.Sys;
 
 public class LeapFrog extends Thread {
-	private double timeScale;
+	private double timeStep;
 	private List<Body> bodies;
 	private ReentrantLock physicsLock;
+	private Timer timer;
 
 	private Thread thread;
 
 	public LeapFrog(double multiplier, List<Body> bodies,
 			ReentrantLock physicsLock) {
-		this.timeScale = multiplier;
+		this.timeStep = multiplier;
 		this.bodies = bodies;
 		this.physicsLock = physicsLock;
+		this.timer = new Timer();
+		this.timer.start();
 	}
 
 	private double getSimpleMass(Body body1, Body body2) {
@@ -66,7 +69,7 @@ public class LeapFrog extends Thread {
 													// leapfrog integration.
 			a[i] = getAcceleration(bodies.get(i));
 		}
-		double t = timeScale;
+		double t = timeStep;
 		while (true) {
 			physicsLock.lock();
 			for (int k = 0; k < bodies.size(); k++) {
@@ -77,6 +80,7 @@ public class LeapFrog extends Thread {
 				b.velocity = vHalf.add(a[k].clone().multiply(t / 2.0));
 			}
 			physicsLock.unlock();
+			timer.elapsedTime += timeStep;
 			for (int i=0; i<bodies.size(); i++){
 				Body b = bodies.get(i);
 				if (b.hasTrail) {

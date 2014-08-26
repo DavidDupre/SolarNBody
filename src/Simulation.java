@@ -10,7 +10,8 @@ public class Simulation {
 
 	public Simulation(String csvFile, double multiplier) throws LWJGLException, InterruptedException {
 		data = new CSVLoader(csvFile);
-		data.bodies.get(3).initTrail();
+		data.bodies.get(3).drawConic = true;
+		data.bodies.get(10).drawConic = true;
 		graphics = new Screen(data.bodies);
 		physicsLock = new ReentrantLock();
 		physicsEngine = new LeapFrog(multiplier, data.bodies, physicsLock);

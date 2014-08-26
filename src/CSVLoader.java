@@ -13,7 +13,6 @@ public class CSVLoader {
 	List<Body> bodies = new ArrayList<Body>();
 
 	public CSVLoader(String csvFile) {
-		Astrophysics vallado = new Astrophysics();
 		BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ",";
@@ -24,17 +23,17 @@ public class CSVLoader {
 			while (((line = br.readLine()) != null)) {
 				String[] column = line.split(cvsSplitBy);
 				if (n > 0) { // skip header row
-					String type = column[15];
 					Body newBody = new Body();
-					switch (type) {
+					newBody.type = column[16];
+					switch (newBody.type) {
 					case "Star":
 						newBody = new Star();
 						break;
 					case "Planet":
-						newBody = new Planet();
+						newBody = new Planet(Double.parseDouble(column[14]));
 						break;
 					case "Dwarf Planet":
-						newBody = new Planet();
+						newBody = new Planet(Double.parseDouble(column[14]));
 						break;
 					case "Moon":
 						newBody = new Moon();
@@ -48,26 +47,30 @@ public class CSVLoader {
 					newBody.mass = Double.parseDouble(column[3]);
 					newBody.systemMass = Double.parseDouble(column[7]);
 					newBody.radius = Double.parseDouble(column[4]);
-					newBody.setSemiMajorAxis(Double.parseDouble(column[8]));
 					newBody.setSize(newBody.radius);
-					newBody.type = column[15];
 					if (Integer.parseInt(column[2]) != -1) {
 						newBody.parent = bodies
 								.get(Integer.parseInt(column[2]));
-						Vector3D[] state = vallado.toRV(
+						double i = Double.parseDouble(column[10]);
+						/*if (Integer.parseInt(column[15]) == 1){
+							i += newBody.parent.obliquity;
+						}*/
+						Vector3D[] state = Astrophysics.toRV(
 								Double.parseDouble(column[8]),
 								Double.parseDouble(column[9]),
-								Double.parseDouble(column[10]),
+								i,
 								Double.parseDouble(column[11]),
 								Double.parseDouble(column[12]),
 								Double.parseDouble(column[13]),
-								newBody.parent.mass * Body.G);
+								newBody.parent,
+								true);
 						newBody.position = state[0]
 								.add(newBody.parent.position);
 						newBody.velocity = state[1]
 								.add(newBody.parent.velocity);
 					}
-					//newBody.initTrail(); // Must initialize the trail after
+					newBody.setSemiMajorAxis(Double.parseDouble(column[8]));
+					newBody.initTrail(); // Must initialize the trail after
 											// finding the position so the trail
 											// won't originate from the sun
 					bodies.add(newBody);

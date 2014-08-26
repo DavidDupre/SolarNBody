@@ -7,7 +7,6 @@ public class Trail {
 
 	public Trail(Body body, int length, int freq) {
 		// Initialize a path
-		body.hasTrail = true;
 		this.path = new Vector3D[length];
 		this.body = body;
 		this.freq = freq;
@@ -20,35 +19,39 @@ public class Trail {
 	}
 
 	public void renderTrail(float[] color) {
-		GL11.glBegin(GL11.GL_LINE_STRIP);
-		GL11.glVertex3d(body.position.x, body.position.y, body.position.z);
-		for (int i = 0; i < path.length; i++) {
-			GL11.glColor4f(color[0], color[1], color[2],
-					(float) Math.pow((1.0 - ((double) i / path.length)), .5));
-			if (body.parent == null) {
-				GL11.glVertex3d(path[i].x, path[i].y, path[i].z);
-			} else {
-				GL11.glVertex3d(path[i].x + body.parent.position.x, path[i].y
-						+ body.parent.position.y, path[i].z
-						+ body.parent.position.z);
+		if (body.hasTrail){
+			GL11.glBegin(GL11.GL_LINE_STRIP);
+			GL11.glVertex3d(body.position.x, body.position.y, body.position.z);
+			for (int i = 0; i < path.length; i++) {
+				GL11.glColor4f(color[0], color[1], color[2],
+						(float) Math.pow((1.0 - ((double) i / path.length)), .5));
+				if (body.parent == null) {
+					GL11.glVertex3d(path[i].x, path[i].y, path[i].z);
+				} else {
+					GL11.glVertex3d(path[i].x + body.parent.position.x, path[i].y
+							+ body.parent.position.y, path[i].z
+							+ body.parent.position.z);
+				}
 			}
+			GL11.glEnd();
 		}
-		GL11.glEnd();
 	}
 
-	private int dont = 0;
+	private double dont = 0;
 
 	public void makeTrail() {
-		if (dont > freq) {
-			for (int i = path.length - 1; i > 0; i--) {
-				path[i] = path[i - 1];
+		if (body.hasTrail){
+			if (dont > freq) {
+				for (int i = path.length - 1; i > 0; i--) {
+					path[i] = path[i - 1];
+				}
+				path[0] = body.position.clone();
+				if (body.parent != null) {
+					path[0].subtract(body.parent.position);
+				}
+				dont = 0;
 			}
-			path[0] = body.position.clone();
-			if (body.parent != null) {
-				path[0].subtract(body.parent.position);
-			}
-			dont = 0;
+			dont += freq;
 		}
-		dont++;
 	}
 }

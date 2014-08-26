@@ -4,6 +4,7 @@ import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 
 import java.nio.FloatBuffer;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -22,7 +23,7 @@ public class Screen {
 	int focusID = 0; // The ID of the body to center the camera on
 	int prevFocus = 0;
 	List<Body> bodies;
-	
+		
 	public Screen(List<Body> bodies) throws LWJGLException, InterruptedException {
 		this.bodies = bodies;
 		
@@ -134,15 +135,71 @@ public class Screen {
 		}
 		
 		body.image.draw((float) body.getSize(), 16, 16);
-		GL11.glBegin(GL11.GL_POINTS);
-		GL11.glVertex3d(0, 0, 0);
+		GL11.glDisable(GL11.GL_LIGHTING);
+		
+		if (body.drawBigSphere){
+			//draw not-to-scale translucent sphere
+			GL11.glColor4f(body.color[0], body.color[1], body.color[2], .5f);
+			body.image.draw((float) (100000*centerDistance), 16, 16);
+		} else {
+			GL11.glBegin(GL11.GL_POINTS);
+			GL11.glVertex3d(0, 0, 0);
+			GL11.glEnd();
+		}
+		
+		if (body.drawConic){
+			if (body.parent != null){
+				//Draw the orbit path
+				HashMap<String, Double> orb = Astrophysics.toOrbitalElements(body);
+				double v = orb.get("v"); //get the current true anomaly so the ellipse passes through the body and looks good
+				Conic conic = new Conic(orb);
+				GL11.glBegin(GL11.GL_LINE_STRIP);
+				GL11.glColor3f(body.color[0], body.color[1], body.color[2]);
+				double e = orb.get("e");
+				if (e > 1) {
+					if (body.parent.parent != null){
+						//Move to your grandparents' if you run away from home
+						body.parent = body.parent.parent;
+						orb = Astrophysics.toOrbitalElements(body);
+					} else {
+						//Draw a hyperbola excluding the ugly bits
+						for (int i=0; i < 50; i++){ //Draw forwards
+							Vector3D r = conic.getPosition(i*Math.PI/49 + v);
+							r.subtract(body.position.clone().subtract(body.parent.position));
+							if (r.magnitude() > 1e12){
+								break;
+							}
+							GL11.glVertex3d(r.x, r.y, r.z);
+						}
+						GL11.glEnd();
+						GL11.glBegin(GL11.GL_LINE_STRIP);
+						for (int i=0; i < 50; i++){ //Draw backwards
+							Vector3D r = conic.getPosition(-i*Math.PI/49 + v);
+							r.subtract(body.position.clone().subtract(body.parent.position));
+							if (r.magnitude() > 1e12){
+								break;
+							}
+							GL11.glVertex3d(r.x, r.y, r.z);
+						}
+					}
+				} else {
+					//Draw an elliptical orbit
+					for (int i=0; i < 100; i++){
+						Vector3D r = conic.getPosition(i*Math.PI/49 + v);
+						r.subtract(body.position.clone().subtract(body.parent.position));
+						GL11.glVertex3d(r.x, r.y, r.z);
+					}
+				}
+			}
+		} 
 		GL11.glEnd();
 		GL11.glPopMatrix();
 	}
 
 	public void focus(Body body) {
 		if (prevFocus!=focusID){
-			centerDistance *= bodies.get(focusID).radius/bodies.get(prevFocus).radius;
+			//Keeps the zoom level in proportion to the size of the focus body. Not sure if I like this.
+			//centerDistance *= bodies.get(focusID).radius/bodies.get(prevFocus).radius;
 			prevFocus = focusID;
 		}
 		GL11.glTranslated(-body.position.x, -body.position.y, -body.position.z);
@@ -151,6 +208,16 @@ public class Screen {
 	private void setFocus(int i){
 		prevFocus = focusID;
 		focusID = i;
+	}
+	
+	private void toggleTrail() {
+		for (int i=0; i < bodies.size(); i++){
+			bodies.get(i).hasTrail = !bodies.get(i).hasTrail;
+		}
+	}
+	
+	private void boostFocus() {
+		bodies.get(focusID).velocity.multiply(1.1);
 	}
 
 	public void pollInput() {
@@ -205,6 +272,12 @@ public class Screen {
 					break;
 				case Keyboard.KEY_0:
 					setFocus(0);
+					break;
+				case Keyboard.KEY_T:
+					toggleTrail();
+					break;
+				case Keyboard.KEY_W:
+					boostFocus();
 					break;
 				}
 			}
