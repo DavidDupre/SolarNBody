@@ -1,3 +1,4 @@
+package dump;
 
 public class Moon extends Body{
 	public Moon(){

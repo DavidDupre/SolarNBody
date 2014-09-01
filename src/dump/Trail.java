@@ -1,11 +1,12 @@
+package dump;
 import org.lwjgl.opengl.GL11;
 
 public class Trail {
 	private Vector3D[] path;
-	private Body body;
+	private Thing body;
 	private int freq;
 
-	public Trail(Body body, int length, int freq) {
+	public Trail(Thing body, int length, int freq) {
 		// Initialize a path
 		this.path = new Vector3D[length];
 		this.body = body;

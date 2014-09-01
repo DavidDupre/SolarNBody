@@ -1,6 +1,18 @@
+package dump;
 import java.util.HashMap;
 
 public class Astrophysics {
+	public static /*D O*/ double G = 6.67384E-11;
+	
+	public static Vector3D dVToCircularize(double r, Vector3D v, double grav) {
+		// Returns the delta-v needed to circularize an orbit given position,
+		// velocity, and gravity of the primary
+		double vCircMag = Math.sqrt(grav / r);
+		Vector3D vCircVector = v.clone().normalize().multiply(vCircMag);
+		Vector3D deltaV = vCircVector.subtract(v);
+		return deltaV;
+	}
+
 	public static Vector3D[] toRV(double a, double e, double i, double node,
 			double peri, double v, Body parent, boolean useDegrees) {
 		// Inputs: semi-major axis, eccentricity, inclination, longitude of
@@ -8,8 +20,8 @@ public class Astrophysics {
 		// argument of periapsis, true anomaly, gravitational constant of the
 		// primary (central) body
 
-		double grav = parent.mass * Body.G;
-		
+		double grav = parent.mass * G;
+
 		double p = a * (1 - e * e); // calculate semi-parameter
 
 		if (useDegrees) {
@@ -59,22 +71,11 @@ public class Astrophysics {
 		return state;
 	}
 
-	public static HashMap<String, Double> toOrbitalElements(Body b) {
+	public static HashMap<String, Double> toOrbitalElements(Vector3D r, Vector3D v, Body primary) {
 		// Find orbital elements given position and velocity. The whole body is
 		// given as input to adjust for parent bodies. Angles in radians.
 
-		if (b.parent == null) {
-			return new HashMap<String, Double>();
-		}
-
-		Vector3D r;
-		Vector3D v;
-
-		double grav = b.parent.mass * Body.G;
-
-		// Adjust for parent body
-		r = b.position.clone().subtract(b.parent.position);
-		v = b.velocity.clone().subtract(b.parent.velocity);
+		double grav = primary.mass * G;
 
 		double rMag = r.magnitude();
 		double vMag = v.magnitude();

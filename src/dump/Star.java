@@ -1,3 +1,4 @@
+package dump;
 
 public class Star extends Body{
 	public Star(){

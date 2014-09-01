@@ -1,3 +1,4 @@
+package dump;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -43,7 +44,7 @@ public class Euler extends Thread {
 		}
 		Vector3D f = Vector3D.normalize(
 				body1.position.clone().subtract(body2.position)).multiply(
-				Body.G * body1.mass * body2.mass / -rSquared);
+				Astrophysics.G * body1.mass * body2.mass / -rSquared);
 		return f;
 	}
 	

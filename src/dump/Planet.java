@@ -1,3 +1,4 @@
+package dump;
 
 public class Planet extends Body {
 	public Planet(double obliquity){
