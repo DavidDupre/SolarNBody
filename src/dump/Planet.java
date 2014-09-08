@@ -1,9 +1,8 @@
 package dump;
 
 public class Planet extends Body {
-	public Planet(double obliquity){
+	public Planet(){
 		float[] newColor = {1f,0f,0f};
 		color = newColor;
-		this.obliquity = obliquity;
 	}
 }

@@ -35,7 +35,7 @@ public class CSVLoader {
 			brCraft = new BufferedReader(new FileReader(craftFile));
 			while (((line = brCraft.readLine()) != null)) {
 				String[] column2 = line.split(cvsSplitBy);
-				if (p > 0 && column2[p].length() > 0) { // skip header row
+				if (p > 0 && !column2[0].equals("")) { // skip header row
 					loadCraft(column2);
 				}
 				p++;
@@ -64,23 +64,15 @@ public class CSVLoader {
 	
 	private void loadBody(String[] column) {
 		Body newBody = new Body();
-		newBody.type = column[16];
-		switch (newBody.type) {
-		case "Star":
+		newBody.type = column[15];
+		if (newBody.type.equals("Star")){
 			newBody = new Star();
-			break;
-		case "Planet":
-			newBody = new Planet(Double.parseDouble(column[14]));
-			break;
-		case "Dwarf Planet":
-			newBody = new Planet(Double.parseDouble(column[14]));
-			break;
-		case "Moon":
+		} else if (newBody.type.equals("Planet") || newBody.type.equals("Dwarf Planet")) {
+			newBody = new Planet();
+		} else if (newBody.type.equals("Moon")) {
 			newBody = new Moon();
-			break;
-		case "Asteroid":
+		} else if (newBody.type.equals("Asteroid")) {
 			newBody = new Asteroid();
-			break;
 		}
 		newBody.id = Integer.parseInt(column[0]);
 		newBody.name = column[1];

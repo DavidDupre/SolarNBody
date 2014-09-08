@@ -16,7 +16,6 @@ public class Body extends Thing{
 	public double systemMass;
 	public double period;
 	public String type = "Moon";
-	public double obliquity = 0;
 
 	public Vector3D velocity = new Vector3D();
 	public Vector3D position = new Vector3D();
