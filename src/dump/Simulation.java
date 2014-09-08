@@ -1,7 +1,9 @@
 package dump;
 import java.util.concurrent.locks.ReentrantLock;
 
+import maneuvers.BiElliptic;
 import maneuvers.Hohmann;
+import maneuvers.Incline;
 import maneuvers.Maneuver;
 import maneuvers.SimpleHohmann;
 
@@ -27,7 +29,8 @@ public class Simulation {
 		graphics = new Screen(data.bodies, data.ships);
 		physicsLock = new ReentrantLock();
 
-		Maneuver maneuver = new SimpleHohmann(arkyd, 60000000);
+		//Maneuver maneuver = new BiElliptic(arkyd, 60000000, 40000000);
+		Maneuver maneuver = new Incline(arkyd, Math.PI/2);
 		physicsEngine = new LeapFrog(timeStep, data.bodies, data.ships, physicsLock);
 		physicsEngine.maneuver = maneuver;
 	}

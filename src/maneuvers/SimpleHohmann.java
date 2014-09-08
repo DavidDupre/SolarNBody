@@ -8,6 +8,7 @@ import dump.Vector3D;
 public class SimpleHohmann extends Maneuver{
 	public SimpleHohmann(Craft craft, double r) {
 		//Puts the craft in a circular orbit of semi-major axis 'r'
+		//Algorithm 36 from Fundamentals of Astrodynamics and Applications
 		this.burns = new Burn[2];
 		Vector3D rI = craft.position.clone().subtract(craft.parent.position);
 		double rIMag = rI.magnitude();

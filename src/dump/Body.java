@@ -28,7 +28,7 @@ public class Body extends Thing{
 	public Trail trail;
 	public float[] color = {1f,1f,1f};
 	public boolean drawBigSphere = false;
-	public boolean drawConic = false;
+	public boolean drawConic = true;
 	
 	public void setSize(double size) {
 		radius = size;
