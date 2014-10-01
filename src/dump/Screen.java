@@ -36,6 +36,7 @@ public class Screen {
 		double width = 1600 * .5;
 		double height = 900 * .5;
 		Display.setDisplayMode(new DisplayMode((int) width, (int) height));
+		Display.setTitle("N-body sim");
 		Display.create();
 		GL11.glClearColor(0f, 0f, 0f, 0f); // the blackness of space
 		GL11.glDisable(GL11.GL_CULL_FACE);

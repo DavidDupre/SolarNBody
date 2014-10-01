@@ -29,8 +29,8 @@ public class Simulation {
 		graphics = new Screen(data.bodies, data.ships);
 		physicsLock = new ReentrantLock();
 
-		//Maneuver maneuver = new BiElliptic(arkyd, 60000000, 40000000);
-		Maneuver maneuver = new Incline(arkyd, Math.PI/2);
+		Maneuver maneuver = new BiElliptic(arkyd, 60000000, 40000000);
+		//Maneuver maneuver = new Incline(arkyd, Math.PI/2);
 		physicsEngine = new LeapFrog(timeStep, data.bodies, data.ships, physicsLock);
 		physicsEngine.maneuver = maneuver;
 	}
